@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Sabbatical</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+  }
+  body {
+    font-family: 'DM Mono', 'Courier New', monospace;
+    background: #F5F2EC;
+    color: #2A2622;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+    cursor: crosshair;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SCROLL WRAPPER (mobile side-scroll) ── */
+  .scroll-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-color: #C8C0B4 transparent;
+  }
+  .scroll-wrap::-webkit-scrollbar {
+    height: 6px;
+  }
+  .scroll-wrap::-webkit-scrollbar-track {
+    background: #EBE8E2;
+  }
+  .scroll-wrap::-webkit-scrollbar-thumb {
+    background: #C8C0B4;
+    border-radius: 3px;
+  }
+  .scroll-wrap::-webkit-scrollbar-thumb:hover {
+    background: #A09888;
+  }
+  .scroll-inner {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-width: 800px;
+    height: 100%;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 18px 24px 12px;
+    border-bottom: 1px solid #D8D2C8;
+    flex-shrink: 0;
+  }
+  .header-sup {
+    font-size: 7.5px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: #A09888;
+    margin-bottom: 2px;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  .header-sub {
+    font-size: 8.5px;
+    color: #8A8078;
+    margin-top: 2px;
+  }
+  .pulse {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #8A8078;
+    margin-right: 4px;
+    vertical-align: middle;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+
+  /* ── MONTHS ── */
+  .months {
+    display: flex;
+    border-bottom: 1px solid #D8D2C8;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .month-label {
+    display: flex;
+    align-items: center;
+    padding-left: 6px;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6A6258;
+  }
+  .month-label + .month-label { border-left: 1px solid #C8C0B4; }
+  .month-label:nth-child(odd) { background: rgba(0,0,0,0.012); }
+
+  /* ── STRIPS CONTAINER ── */
+  .strips {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    min-height: 0;
+  }
+
+  /* ── STRIP ── */
+  .strip {
+    flex: 1;
+    position: relative;
+    transition: background 0.1s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .strip::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    right: 0;
+    width: 1px;
+    background: rgba(0,0,0,0.03);
+  }
+  .strip.month-start { border-left: 1px solid #C8C0B4; }
+
+  /* Empty strips */
+  .strip:hover { background: rgba(0,0,0,0.025); }
+
+  /* Data strips */
+  .strip.has-data {
+    /* background set inline from image color */
+  }
+  .strip.has-data:hover {
+    filter: brightness(1.1);
+  }
+
+  /* ── WORD COUNT BAR ── */
+  .bar {
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    border-radius: 1px 1px 0 0;
+    /* background set inline as lighter tint of strip color */
+    transition: opacity 0.2s ease;
+  }
+  .bars-hidden .bar {
+    opacity: 0;
+  }
+
+  /* ── TOGGLE ── */
+  .toggle-btn {
+    margin-left: auto;
+    background: none;
+    border: 1px solid #D8D2C8;
+    padding: 2px 8px;
+    font-family: inherit;
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    color: #9A9184;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .toggle-btn:hover {
+    border-color: #B0A898;
+    color: #6A6258;
+  }
+  .toggle-btn.active {
+    background: #E8E4DC;
+    border-color: #B0A898;
+    color: #5A5044;
+  }
+  .color-toggles {
+    display: flex;
+    gap: 4px;
+    margin-right: auto;
+  }
+
+  /* ── RULER ── */
+  .ruler {
+    display: flex;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-top: 1px solid #D8D2C8;
+  }
+  .ruler-mark {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .tick {
+    width: 1px;
+    flex-shrink: 0;
+  }
+  .day-num {
+    height: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6.5px;
+    color: #8A8078;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    padding: 5px 24px;
+    border-top: 1px solid #D8D2C8;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 7.5px;
+    letter-spacing: 0.08em;
+    color: #9A9184;
+    flex-shrink: 0;
+  }
+  .swatch {
+    width: 8px; height: 8px;
+    display: inline-block;
+    margin-right: 3px;
+    vertical-align: middle;
+  }
+
+  /* ── HOVER CARD ── */
+  .hover-card {
+    position: fixed;
+    width: 310px;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  .hover-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .card-inner {
+    background: #FDFCFA;
+    border: 1px solid #C5BDB0;
+    box-shadow:
+      0 8px 30px rgba(0,0,0,0.10),
+      0 1px 3px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+
+  /* Image area with color placeholder */
+  .card-img-wrap {
+    width: 100%;
+    height: 220px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-img-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card-img-placeholder span {
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .card-img.loaded { opacity: 1; }
+
+  .card-meta {
+    padding: 10px 14px 12px;
+  }
+  .card-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 5px;
+  }
+  .card-day {
+    font-size: 7.5px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #8A7A66;
+    font-weight: 500;
+  }
+  .card-date {
+    font-size: 7.5px;
+    color: #B0A898;
+    letter-spacing: 0.05em;
+  }
+  .card-text {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 12px;
+    line-height: 1.6;
+    font-weight: 400;
+    color: #3A3632;
+  }
+
+  /* Empty day hover */
+  .card-empty {
+    padding: 18px 14px;
+    text-align: center;
+  }
+  .card-empty .card-day { margin-bottom: 2px; }
+  .card-empty .card-date { margin-bottom: 8px; display: block; }
+  .card-empty-msg {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 11px;
+    color: #C5BDB3;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-sup">Tableau Graphique</div>
+  <h1>A Sabbatical</h1>
+  <div class="header-sub"><span class="pulse"></span>In progress · 15 Sept 2025 – <em>present</em></div>
+</div>
+
+<div class="scroll-wrap">
+<div class="scroll-inner">
+<div class="months" id="months"></div>
+<div class="strips bars-hidden" id="strips"></div>
+<div class="ruler" id="ruler"></div>
+</div>
+</div>
+
+<div class="legend">
+  <span class="color-toggles" id="colorToggles">
+    <button class="toggle-btn active" data-mode="saturated">SATURATED</button>
+    <button class="toggle-btn" data-mode="kmeans">K-MEANS</button>
+    <button class="toggle-btn" data-mode="accent">ACCENT</button>
+    <button class="toggle-btn" data-mode="brightness">BRIGHTNESS</button>
+    <button class="toggle-btn" data-mode="hue">HUE PEAK</button>
+    <button class="toggle-btn" data-mode="center">CENTER</button>
+    <button class="toggle-btn" data-mode="temperature">TEMPERATURE</button>
+    <button class="toggle-btn" data-mode="tumblr">TUMBLR API</button>
+  </span>
+  <button class="toggle-btn" id="toggleBars">WORD COUNT(Scale:1:5)</button>
+</div>
+
+<div class="hover-card" id="hoverCard">
+  <div class="card-inner" id="cardInner"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA
+// Day 1 = Sept 15, 2025 
+// ═══════════════════════════════════════════
+const DAY_ONE = new Date('2025-09-15T00:00:00');
+const TOTAL = 91;
+
+// Posts keyed by day number
+// image: s540 size for fast loading. color: dominant color from API.
+const P = {
+  1: { t: "Met a friend and gave him a hotwheels, met another at a coffee shop, did my dermatologist procedure, spent too much time (while being anxious) trying to figure out my tax and started this blog.", img: "https://64.media.tumblr.com/960caf0422b05c7b30fdd61681f16076/c821f7d0fb142e62-0e/s540x810/eda1c572247fd5bcccca1d48fb3872a6bb797c6b.jpg", c: "#2a231c" },
+  2: { t: "We ran a workshop with the team, I tried to figure out logging into the bank website (unsuccessfully), went out and had fun, rescheduled flight for next month. Plagued by lower back pain :/", img: "https://64.media.tumblr.com/96111b39e9e8f453abbdcacbe593c439/2d6b2af7e42acc2c-44/s540x810/9be7512b323331b3ded8aecadd2f411bc76e90a9.jpg", c: "#020203" },
+  3: { t: "Apart from therapy, it was mostly a sick day spent watching dota2ti, met friends in Indiranagar briefly and rewatched Su from So to end the day.", img: "https://64.media.tumblr.com/547f3b49fa7bd9518fa895536f7f327a/da3c4b1734c3e5c5-f7/s540x810/eca0550a42a3c1e63835f5df792da08efbd1d844.jpg", c: "#030201" },
+  4: { t: "slow start with some laundry done, watched The Roses, Had some Japanese food, thought XG would win given their strong showing but Falcons brought some great drafts to the grand final, filled water to prepare for the next few days.", img: "https://64.media.tumblr.com/89bc8c1e9039d104616a5e086f7d9be5/7c243855effe20ba-b0/s540x810/60045bac417094637aa4ac543c773c52aa9d3aca.jpg", c: "#050302" },
+  5: { t: "Woke up feeling low, and then discovered that the car had mold growing in it. Felt overwhelmed. but held it together. Resolved to clean it tomorrow, Bought car insurance, bought tickets to home, gave away e-waste. At the time of posting this, I'm anxious about an income tax payment that has got lost due to a server error, Unsure what I need to do next.", img: "https://64.media.tumblr.com/4c834e901c5c6bd879274e1fc890e58e/f1ca1620df28e333-1e/s540x810/78d21444044f6ffc2897a25d89f2e8a1e4b2c032.jpg", c: "#060604" },
+  6: { t: "A tiring day, started off with finding the advance tax receipt and moved on to me finding out the car battery is dead while I cleaned the mold out. with the windows down, I was anxious about it. we eventually got the battery checked and the windows rolled down but the car is still unlocked. tomorrow we will add a new battery and hopefully close the issue for now.", img: "https://64.media.tumblr.com/82a5036c92681c0cffe73683bb1852c9/38f77711a5943613-6b/s540x810/374b894c669648a6b74bad986cc40eda5c80d035.jpg", c: "#030201" },
+  7: { t: "wow a week has passed. it sure doesn't feel like it, I guess its because I've been used to this for a while now even before the start of the sabbatical. there's a little bit of fear at the back of my head of a possibility of not getting another job anytime soon. today was an off-day, got round to doing nothing except for car battery getting replaced and booking flights for December.", img: "https://64.media.tumblr.com/7807ebfa7e4e9975fa796c310e19cc32/d658f9ebba486add-b6/s540x810/fcb789861eaefbf3fccaade62dbeb2deb998af11.jpg", c: "#110e0b" },
+  8: { t: "There were many pics to choose from but in the end, I choose this.  Today was spent mostly packing, travelling, flying home and ended up with me getting drenched in the rain due to an apathetic cab driver who dropped me in the rain instead of taking my suggested route. I tried to fix the shower head, but still need to do one more fix for a water leak. As the day ended, I learnt that I needed to figure out my health insurance situation to pay for Dad's surgery.", img: "https://64.media.tumblr.com/1a6f2fa506b60a2a7a8f870deec39617/fd248d88eb09557c-d9/s540x810/a50bab06e2b93ee58082081b7a914cff76a8262e.jpg", c: "#486d84" },
+  9: { t: "Paper work got completed and I got one of my bank work done. I can't imagine how you are supposed to do all this with a 9-5. The common man just ends up having to pay for the speed to processing if they want to get anything done in time. Ate dilkush to reward myself, went for a walk and got a shave. The next two days are a break.", img: "https://64.media.tumblr.com/3363e5c3d7084010508a80d24c2cec44/532c3462198368ee-06/s540x810/3da448571d74386a2d63c5b8a6d0098d0f24c95f.jpg", c: "#2f261c" },
+  10: { t: "wow I actually missed posting last night and didn't really have any good photos to consider apart from this dinner. Most of yesterday was not very eventful, and the most I think I did was send emails.", img: "https://64.media.tumblr.com/00ceaf175bd88daf463fa4108275b6be/20daf93ead9e6aeb-b8/s540x810/d6fced8bc303496c412600f9c46fca4803119b0c.jpg", c: "#4d2718" },
+  11: { t: "Okay now I am slacking off. On Sunday evening we had the local ward function at our house. I ate a Shawarma for dinner.", img: "https://64.media.tumblr.com/addacecd417fed96b692829950467793/5a2a0a9477b11b99-a4/s540x810/36a688fa257e965bcadf56329a191a00f3334fc9.jpg", c: "#0f0400" },
+  12: { t: "Today was the operation day, not for me. Spent most of the day in the Hospital just doom scrolling and waiting. Tomorrow also looks to be like that.", img: "https://64.media.tumblr.com/374a9b13b00737b76bf87ad364c0683e/43adff5e08c8ffee-f4/s540x810/bbeed51e6b03abba694b6a4bbb2640b6fafee19d.jpg", c: "#0c0906" },
+  13: { t: "Strange but these days it's hard to find an image to post and I've been in a downward spiral for the most part. and downward spiral means stress eating so here's a picture of a Parfait.", img: "https://64.media.tumblr.com/804f36bedab07305fc629edad0c206b1/ee7718c317aec183-54/s540x810/438a74790c8b7b3a19f020001cd46f2ccd6d6aae.jpg", c: "#020203" },
+  14: { t: "The Lost Archives", img: "https://64.media.tumblr.com/16d52d625a0242c610a2ca7c906d2a1e/0c75775f08f6a2b2-b9/s540x810/c792320e2feb465dc9a1616430f0ea540cf01dac.jpg", c: "#030202" },
+  15: { t: "The Lost Archives", img: "https://64.media.tumblr.com/03e479ac970a975d5ab6a314c79fa1eb/76b46675d5eac533-a6/s540x810/ac88362f87354ace36b411f6a072f3b75b1445f8.jpg", c: "#838288" },
+  16: { t: "The Lost Archives Met a friend, collected my card and cooked some mushrooms", img: "https://64.media.tumblr.com/3c51fd37295df4bda123f2726bede530/e1672d3c9b722bbf-6e/s540x810/1617285298ace421d93f46649ac1d8bb3f5a9298.jpg", c: "#1a0e08" },
+  17: { t: "The Lost Archives Travelled in a sleeper bus back and spent a lot of time in traffic", img: "https://64.media.tumblr.com/711e09865f0d7137372ffe12290c3e94/68c5e6415e90adad-58/s540x810/face7369aeee557d9a9885434ab3e0b015a060c4.jpg", c: "#0e0705" },
+  18: { t: "The Lost Archives Cooked some chicken", img: "https://64.media.tumblr.com/70b6051c3ddf8ebf3e2ebf86bbd8e78a/5f06e3f3e6fefde9-54/s540x810/ae7f0ec590c9ab14a78a5d2f51f33cc0c7466ee2.jpg", c: "#8c766d" },
+  19: { t: "The Lost Archives", img: "https://64.media.tumblr.com/36acdc430cda81ea929057919c53ec9b/2b16396272b91c4d-96/s540x810/fe8637c857b8ec6b0b6ce01550e8206c6a29598c.jpg", c: "#020202" },
+  20: { t: "The Lost Archives", img: "https://64.media.tumblr.com/040f9a6266fab98afcda6ec07419758e/82d32ad276fa0e00-0f/s540x810/12ef0b64e261c3e03a2045daad8e7312c880a79e.jpg", c: "#040201" },
+  21: { t: "The Lost Archives", img: "https://64.media.tumblr.com/5efb74a9fedc927209d8e5d844544da7/0d4d2aee957816e7-00/s540x810/a01aa137388111de9b05b989ddb76d062cfd176f.jpg", c: "#090a07" },
+  22: { t: "The Lost Archives", img: "https://64.media.tumblr.com/4f2b3b266749248d32ecc7bf6cbbdbfb/bd624db1ed24ea27-a3/s540x810/9fdb5f955b9421d96aee122a1b9e79a08b4d4ead.jpg", c: "#030407" },
+  23: { t: "The Lost Archives", img: "https://64.media.tumblr.com/298559c8c46356e6ece87344b86c237b/c7fdb6910954fae6-2b/s540x810/2079a8fd2e77e4a0fa88a81f20b2660d5aeb479b.jpg", c: "#1a170f" },
+  24: { t: "The Lost Archives", img: "https://64.media.tumblr.com/6a778ffaee0497e635081e83dc0389e9/efb47fbd9f57caa2-82/s540x810/02760501bbc5ec90d7ba2ec4b18e3f474b117e40.jpg", c: "#1f0203" },
+  25: { t: "The Lost Archives Pretty Sunset", img: "https://64.media.tumblr.com/a989b2c2c1109c0c30e5036823ed47b3/aa47271237a30695-e4/s540x810/be259666c2024d3c51953d5615d5053ebd841715.jpg", c: "#0e090d" },
+  26: { t: "The Lost Archives The Internet phone book arrives", img: "https://64.media.tumblr.com/3cefafada994effbbffae8637b45ee67/bc4f34c0f88ce643-12/s540x810/68ae36c47fc11ed04eacef3e23d11313ac56bd5e.jpg", c: "#13100d" },
+  27: { t: "The Lost Archives", img: "https://64.media.tumblr.com/c4837e9ec06a29b33b4b7dd040f9f871/6051e5f0729b31c7-b8/s540x810/0af5f53dec4dfcdc906ec2c9cc86339da2125993.jpg", c: "#a3a7a4" },
+  28: { t: "The Lost Archives", img: "https://64.media.tumblr.com/c95d40f128a1f623e2533fed966594ad/02366b302fb53a77-d5/s540x810/cee39d0c5719b5a42d4ea70079e95ae6642c580a.jpg", c: "#261b14" },
+  29: { t: "The Lost Archives", img: "https://64.media.tumblr.com/f41f53adfd9c560f5a438e778810bb2c/8d700ae22c090c48-20/s540x810/27881c385dba1c4462d93a71369d9b0401abc4a9.jpg", c: "#0a0604" },
+  30: { t: "The Lost Archives A massage and Karim's for dinner, and a whole lotta traffic", img: "https://64.media.tumblr.com/15dadabd1fb521f2b687bce859f3bd04/dcb6581e822bb770-26/s540x810/cf61ee03c24f0ef0c746bad7a3109ed3c2c7e6b3.jpg", c: "#333" },
+  31: { t: "Met ex-colleagues and many friends at the Glass Beams concert, had dinner at La Goia and slept really late. A good way to wrap up the first month?", img: "https://64.media.tumblr.com/d8b44bc358da9b5cb11a6ab67ab82bef/f654fdcebf82dd57-4a/s540x810/73379abfb823f477c4faa9885a584a8d7a605160.jpg", c: "#010000" },
+  32: { t: "Did nothing much expect a medicine and bread run in the evening and saw these displays parked", img: "https://64.media.tumblr.com/872972661f39df8fcc3fc7da7325466d/020facfb71d1820f-99/s540x810/ac0b0343d0333fcb2a4f916629df288f93b11ed3.jpg", c: "#080704" },
+  33: { t: "Woke up late, ate leftover burrito for breakfast and then spent the rest of the day travelling by cab, flight and metro", img: "https://64.media.tumblr.com/b4bb87dc38a26eebd3abbda72fbb9509/e4c22532a14585ba-ce/s540x810/d171d8dfdf9f4c42315eaecd7a2337b213ebae33.jpg", c: "#171614" },
+  34: { t: "The chicken curry was the highlight of an otherwise lazy day. Spent time working on the presentation that I wrote the outline for during the flight yesterday.", img: "https://64.media.tumblr.com/57bd7aa4749d316388b768ce5e6f2a05/b7608718a6e1ecbd-60/s540x810/7266f6dc12a829ab4ea1bc9125590c4113882c65.jpg", c: "#070404" },
+  35: { t: "Got new Crocs (so comfortable), Finished the first draft of the presentation, played badminton + tt and visited some relatives.", img: "https://64.media.tumblr.com/b0f6e8719494dae038991141ef6610bb/896a42d352208431-d1/s540x810/2a77777184e2c4873854548a26ba43886c789012.jpg", c: "#211006" },
+  36: { t: "A shave and a massage in a local barber shop", img: "https://64.media.tumblr.com/af3f06d607e3e96f2bfe70499d0fd43c/9a74ca1d677ea438-bb/s540x810/e024bfb7abac5777ae31a94aef8e620bcc6f091b.jpg", c: "#1d1a18" },
+  37: { t: "Lot of shopping followed by Mango McSwirl and Housie", img: "https://64.media.tumblr.com/f54cd4788f9f32cf844e5adb9cc233e9/6a517533116687af-43/s540x810/550d75b1037ab1c35e7118e0080a975556799d67.jpg", c: "#352e2f" },
+  38: { t: "Day of shopping, went to Chowk for first time, had chaat for late lunch at Hazratganj and finally ended with some Bade ke kebab at night", img: "https://64.media.tumblr.com/b29c771cb38667d162e4e846db416fff/9d2e0f7774a32d22-ce/s540x810/9d05fbaacc48ec18cfbe86fd2f98abf8238da968.jpg", c: "#51678a" },
+  39: { t: "Went out for Coffee, met people and came home for the Pooja. Played more Housie.", img: "https://64.media.tumblr.com/5867ca59cd9f581b343fe79f0b53d102/38e2d5e7e9305405-25/s540x810/985a890711e865eda468871f391629ee7b0dce9d.jpg", c: "#413219" },
+  40: { t: "Lunch with family. Chicken and Mutton and more Housie. Followed by a visit to Roastery, Naimat Khana and procurement of Bun Kebab and Ande ka Halwa.", img: "https://64.media.tumblr.com/73c709b26e486cb58868ece3055c7678/1f53c0e24c64c575-3d/s540x810/cd0aa92b82a75cfdf431eb2f99461fafa5f9f56e.jpg", c: "#010102" },
+  41: { t: "Went to Aminabad, found some spices, saw some type, controlled ourselves at Tunday Kababi so that we could have yum homemade mutton for dinner.", img: "https://64.media.tumblr.com/09bb921a41e59f36a69e09b6ff60cd8e/2be31f6b48e067d2-f6/s540x810/da263af980bc7b602fdd9aaed7b953c35dee488e.jpg", c: "#52442b" },
+  42: { t: "Slow day with the fatigue catching up but ended up with a trip to Breakpoint Dhaba for some good Chicken Kali Mirch", img: "https://64.media.tumblr.com/53dbbe228432c0416eb057665f01692c/01b82f513a9866e0-df/s540x810/908950dc3d7b65de351190e05a8e6cf3cca1a774.jpg", c: "#010100" },
+  43: { t: "The last day in Lucknow, so we packed and ended the day meeting family.", img: "https://64.media.tumblr.com/56da8b1bb42f9e042d42476212aa86e4/15fac9b4cb7e3d90-63/s540x810/636eec1247d348e6368877164445a591d168f976.jpg", c: "#0b1125" },
+  44: { t: "Spent the day travelling back. Came from warm weather to a cold one. Though this image doesn't imply that. Felt the urge to eat junk food.", img: "https://64.media.tumblr.com/640b07480f7db923aebfbce0a642f2ce/cbbda52d19f0be2b-3d/s540x810/7d7ca70b3ce643f82ca364bd43e699b28cda6624.jpg", c: "#2f496e" },
+  45: { t: "Went to meet friends at Maverick", img: "https://64.media.tumblr.com/3636c0bb1e4d805cbef9c1d2d5b029bd/97f4d9980de79bec-68/s540x810/8536614e3db42ea6e6b781e9be68cfaee1ad6ba7.jpg", c: "#030c1c" },
+  46: { t: "Went to college and sat in a review.", img: "https://64.media.tumblr.com/c878a1902b3ad376202ea542bfe057a4/2020cb72a39049df-e5/s540x810/74b62298a098f56468834ebc79098a08083f18ef.jpg", c: "#070c06" },
+  47: { t: "Barely slept last night, ate chips as late night snack and woke up with an itchy throat. Not much done today but I sorted some 20 zines to lend.", img: "https://64.media.tumblr.com/3412807c6a92f58d62acb697be5adbe1/a133ac64d1e6cda8-fa/s540x810/c93e54bedc4288abe29bbf45c1181dc0d44a9835.jpg", c: "#695035" },
+  48: { t: "Went out to meet a friend, bought some coffee equips and ate at Shivaji Military and Juny's.", img: "https://64.media.tumblr.com/64041d3a585d1429273df9f13d2e34f7/14d6555843daf1ac-75/s540x810/52dccadd3637c65c1991010ebadb681d7121d495.jpg", c: "#010101" },
+  49: { t: "Stayed at home, but went out for a walk in the evening.", img: "https://64.media.tumblr.com/b5e86829848f362144f2510115bf2b73/779e955f7dc295ce-5b/s540x810/1d752d74ba02bf011533f8c19f364b6092e340ce.jpg", c: "#030302" },
+  50: { t: "Went for the designxAI showcase, saw some good work.", img: "https://64.media.tumblr.com/0504dfe9a00a9cf0f0e6681be510d60d/dae5ea5d62e0a20c-48/s540x810/e026a4cca8f679214e9429fc06ffaa0c377fb51c.jpg", c: "#010203" },
+  51: { t: "Did nothing, but tried to read", img: "https://64.media.tumblr.com/e338aebc41eb85534b001e5ba84cf179/7acd76722625ee6b-1b/s540x810/600060deb2ba2c8c0c813bbec8c46255323703d8.jpg", c: "#30291d" },
+  52: { t: "Took the metro to the design conference, whitefield feels so industrial and reminded me of the Industrial Revolution.", img: "https://64.media.tumblr.com/7bbc8f383834a65aa1178f6f41d9aaf5/4f06610a54cf1890-e6/s540x810/890202b5011aba6a356abfbf838c87636c689b96.jpg", c: "#020202" },
+  53: { t: "Day 2 of design conference, spent time to talk a little deeper with the people I wanted to. Had a good post conference hangout.", img: "https://64.media.tumblr.com/9044439a28e0a5461cd32a84df2f31d5/f5508c9b7705ca4a-eb/s540x810/2ed494a83d7b543344a2aa76c52c26171561dbff.jpg", c: "#040102" },
+  54: { t: "Woke up with a cold, didn't do anything much.", img: "https://64.media.tumblr.com/fc27ef1f692a9166007e4fd79af4f2e0/8c771738e1c4c4de-7b/s540x810/67c0401bef372856c9b4fc7ae785d69d2d0f285b.jpg", c: "#060606" },
+  55: { t: "Another day spent doing nothing much, watched the Dylan video and started the cursor one. Went for a walk and bought KK momos.", img: "https://64.media.tumblr.com/d2e36d8461d42be69e5c1453f32024a0/3652aca548fb272d-9a/s540x810/bf19bb6e72c9269e7fbe84f7cff92127773d76ff.jpg", c: "#584608" },
+  56: { t: "Cleaned a bit in the house, bought the first stollen of the season.", img: "https://64.media.tumblr.com/6479cc8e8aa695f04f6c5b5f9fb9763c/538c3baef4219eb6-20/s540x810/151966d43b4fad8f5c9db9c6b7323064986cdce4.jpg", c: "#313032" },
+  57: { t: "Spent the day in Yelahanka, ate mutton, drank coffee and tea and in general lazed around.", img: "https://64.media.tumblr.com/16db78f64104313e3c7d242f148a204a/49c768f3be13ff3f-27/s540x810/be1e1fb18b74c16dca4be6a01481fda271fb380e.jpg", c: "#010102" },
+  58: { t: "Replaced the stollen with a fresh one.", img: "https://64.media.tumblr.com/9856b8cccfb227f181480abb8bdf6c5a/e5041a3ba178b822-4f/s540x810/02859f52f1b3893a28895a60b4475ab25922864e.jpg", c: "#362b1f" },
+  59: { t: "Went for recurse coworking and puzzled pint and ended up with dinner at phobidden fruit", img: "https://64.media.tumblr.com/d7ea8c4eb68949a4be1210f781d9751f/7652fefa598422c0-e9/s540x810/01edbaafe518ef3c8ff0114e87921d31f13b0632.jpg", c: "#040404" },
+  60: { t: "Figma event took me back to Whitefield, made progress on my first vibe coded app using Claude. ended the day with dinner at Lazy Suzy", img: "https://64.media.tumblr.com/f77ffba4fdb3226846d96b97178c927c/2732a446f1caa3a2-c8/s540x810/9d84596301090bb718dd42b37889497f67f51626.jpg", c: "#000000" },
+  61: { t: "Made my second vibe coded app but eventually hit weekly limits, smash guys isn't as good as it was, the maki's cheesecake is definitely the best, plants were acquired.", img: "https://64.media.tumblr.com/43dedfb413c835a7afc9704def43cc2e/af56155226e6531f-2e/s540x810/e2f4b47ee7f613e9c6095891134e522296eb7bae.jpg", c: "#24272d" },
+  62: { t: "Understood the hype around Dak Milky Cake. Packed bags.", img: "https://64.media.tumblr.com/3cb2751493c97c497bea7538a0fb32b0/3f5ce7e9dacabe5f-8a/s540x810/3585b346c4b6f3b8a83ba5b7b4a02ab25d7428fb.jpg", c: "#47221d" },
+  63: { t: "Probably one of the best sunsets I've seen ever", img: "https://64.media.tumblr.com/034b71c87fbed102396a38303c3d49d7/deca65a4e40c8199-1b/s540x810/4abd12d7ed0acdc52909bb072f9376f273b3606a.jpg", c: "#2e405e" },
+  64: { t: "Walked around, met a balinese and saw a lot of connections to Sri Lanka being mid-way between India and Indonesia.", img: "https://64.media.tumblr.com/a6fcd1c01f64577b3c42fb6b7694891a/e9a3eafbfb0dc15f-22/s540x810/94030069f956bc3ed4cb6744526198124808ad75.jpg", c: "#1a1f0d" },
+  65: { t: "Rainy day. Kept indoors and drew a little, except for lunch when we got stuck in the rain.", img: "https://64.media.tumblr.com/fb6985f086ecb61e23d47daae8c26ed0/ba3cf9f8e4851417-55/s540x810/0c56155bcf6040314148382379838146eb2af2e7.jpg", c: "#100704" },
+  66: { t: "Saw lot of wildlife and a sunset", img: "https://64.media.tumblr.com/5e10e6c52e2955ad72e1437686760281/a8b4634f3eec8c23-5b/s540x810/0a94ff25e5c7eb06942e45e3728b978bc867f553.jpg", c: "#30303d" },
+  67: { t: "Walked around Galle fort and had good Chinese food for dinner", img: "https://64.media.tumblr.com/ebb69b44c66c696109d0e02321f3cdeb/b1762d6e6f22c9ef-e2/s540x810/18eb118ac84ba6db66eafa008adb07a4b512b9b7.jpg", c: "#0e0702" },
+  68: { t: "Drew a little, walked a lot and talked some coffee.", img: "https://64.media.tumblr.com/f35721bc5d6dbf7647c3cff0fd1d4eba/abea6e6ca8b8a6c0-7f/s540x810/74dbb06802474397ad6be501357486a87322071b.jpg", c: "#040101" },
+  69: { t: "Wrote postcards, shopped a bit and ate more.", img: "https://64.media.tumblr.com/0a050fa81e83d729739389af8795fed9/5ecf78921df4cbe2-12/s540x810/b3a90e8bf06480a27c0c1a350c4c9014168d0de1.jpg", c: "#050201" },
+  70: { t: "Reached Mirissa and did a beach day, rained towards the end but was fine.", img: "https://64.media.tumblr.com/f230ae2b803206cd8ad885987e4d4773/530a91403f4610c8-cb/s540x810/81068d4c50df86e07d2f073cd0e466ace65c3fe0.jpg", c: "#0e1411" },
+  71: { t: "Another overcast day with the cyclone getting closer. I went for walks when it was possible. Visited Ahangama for Sunset. Ended the day at Donna.", img: "https://64.media.tumblr.com/fe66b19251e10bb0d411e7e8d67bf9fd/fbb81d3fc6b7b915-3f/s540x810/2fb3fe1ed199c0ecbc3cc889df0f05b31f3f692e.jpg", c: "#696f6d" },
+  72: { t: "The rains had started. Spent the day at Donna. Went to Matara in the evening and it started pouring. Somehow got back to Mirissa, had a meal and then paid a lot of money to get home.", img: "https://64.media.tumblr.com/cd8ebbd512d253b02607ba348899a30f/29b5ff6bd7c4c6aa-1e/s540x810/a39f469e5312296d712a7ce5df341a12600cecce.jpg", c: "#0f0a06" },
+  73: { t: "We got out and worked out of Zephyr. It kept raining. For Dinner, I found a Japanese resto that was in its trial phase. And I saw my first Scorpion.", img: "https://64.media.tumblr.com/94f69278dd4bd4fb7927a3e263a306e0/35e9379c15f45e5b-7b/s540x810/484e2b7eb106d2356c8863b8bb32cfe8d3aaab78.jpg", c: "#030402" },
+  74: { t: "The rains have reduced, the wind is still strong. Finally spotted a Paan van with its Beethoven music playing.", img: "https://64.media.tumblr.com/cef0e461ba53f2bda413d1824213f005/57916d0b355372ce-13/s540x810/c0abc129969825db0786a64883dcdc4e3f04eddf.jpg", c: "#000000" },
+  75: { t: "Sun's out. Our last day in Mirissa. Our last day in Ahangama. More Donna.", img: "https://64.media.tumblr.com/4e342561c122467ae2becd680a490bf9/7ab9daef718ceb51-b4/s540x810/f458836eea3b5d127131c6a75b0fb982df94c9f3.jpg", c: "#090505" },
+  76: { t: "We are ready to head back, but our flight's cancelled. With help, we make it to Colombo and re-book flights. We get 2 extra days. There are no clouds.", img: "https://64.media.tumblr.com/f9ef20e0208233ea5d201faca1215d29/0138d77485bbd931-ad/s540x810/0b0786b7095942a5058baf5ede80807100fcc6ba.jpg", c: "#1d1f16" },
+  77: { t: "Spent walking around Colombo. Shopped. Ate some Indonesian and Japanese.", img: "https://64.media.tumblr.com/d8ad85960c0ca44ae185d92cc994a33c/78d9fd42716df031-ed/s540x810/1051c97f385c5815287d10c2f4b1c33bb119f709.jpg", c: "#0e0c0a" },
+  78: { t: "Last day in Colombo.", img: "https://64.media.tumblr.com/ba8608937603527e42828161e5cda6b0/fc48e9273557d17c-d6/s540x810/328fd98ad3e20e220b0674387c0c00a9d8e69574.jpg", c: "#0f0c09" },
+  79: { t: "Back home and unpacking", img: "https://64.media.tumblr.com/4117278c57e81a8da2e72acfdabaae44/1c871834b0aaf636-a1/s540x810/1390ab75f277b9d2c33afcde96bc6e9ff0caf96e.jpg", c: "#9c9377" },
+  80: { t: "The birthdays are beginning.", img: "https://64.media.tumblr.com/4e19f9812a3185ab452c36823f0a4038/7ae68b8823289663-5b/s540x810/d05625cb3697bcfaf0d714f0060d6bf7c3d31970.png", c: "#010101" },
+  81: { t: "Birthdays, unpacking and new shoes", img: "https://64.media.tumblr.com/31351d2fdb08dce4bd5f6ed2c44465bb/2874d71c8e045491-3c/s540x810/16b0f60fee55a7d093f2b52e8c2084e72742d989.jpg", c: "#110401" },
+  82: { t: "Studio Potters market. More Dinners.", img: "https://64.media.tumblr.com/b45e102875c71b056c588e1f4b7272fe/6810a21605b726e2-d9/s540x810/c794da5e56f637ec4929f38110fc49f777dbbc66.jpg", c: "#585b57" },
+  83: { t: "Chocolates. Lot of chocolates.", img: "https://64.media.tumblr.com/dac78b2ab4fcc1d1e11b0de19e925fbd/48a9b6474d81dfa5-5b/s540x810/ec23f48ad9905a9e77ddbc12176a87637e1e54ad.jpg", c: "#080708" },
+  84: { t: "A lazy day", img: "https://64.media.tumblr.com/605c1133b39a994e36c84426001caa11/6718e7586cac07f7-5b/s540x810/8ce6573357f697f13913302ba14b01803168270e.jpg", c: "#888779" },
+  85: { t: "Finding old coffee gone bad. Packing.", img: "https://64.media.tumblr.com/503d986e7b959b13dd41c6de0f7f3d78/868106d87777ac28-70/s540x810/f6c0185ffd8c6a6de912f7fd5f016ff14e39e529.jpg", c: "#020101" },
+  86: { t: "Happy place. iykyk.", img: "https://64.media.tumblr.com/f6abcfecbd69e23c4240e65d15d8d7ba/a2db7483b541a93e-20/s540x810/ad495630992099c37b23de39ef4e91e5d4463aa0.jpg", c: "#000000" },
+  87: { t: "Coffee. Ramen. Shopping.", img: "https://64.media.tumblr.com/2f83b3bc7b63aec9dd5cd96f16d9d6b2/11dc190b53b804d9-6b/s540x810/8e5c18ede29940d10edf015c10db827d4d11fee0.jpg", c: "#3f6db8" },
+  88: { t: "The party begins.", img: "https://64.media.tumblr.com/b8133e9c392108f6cf760c1d7c0fc8c1/441f7fbc0da5aa03-2a/s540x810/eccb777c46d06627c99ac73820d8884d0390b4d8.jpg", c: "#0b0603" },
+  89: { t: "Cooking. Coffee. More Party.", img: "https://64.media.tumblr.com/5b5d0536c77b061d6696c229da3432e4/3e55c859c3182c0d-06/s540x810/f4a63af4057508ceb4c3d2dd33d1d0cfca1b782c.jpg", c: "#050302" },
+  90: { t: "Last day of the party.", img: "https://64.media.tumblr.com/a4cf0583445693b0e084358028450e61/fd8d40f098d0aa7a-c7/s540x810/2e6eafbfd44cf3a3335959f22c07787995c58dbb.jpg", c: "#0e0603" },
+  91: { t: "Packing, Transiting, Sightseeing.", img: "https://64.media.tumblr.com/9d0aeaf572198730d56b7ed745708b45/f198b6061f747adf-a4/s540x810/4b31141989e81d5e5be4428f1a24b3925d6fd50e.jpg", c: "#411613" }
+};
+
+const COLOR_MODES = {
+  saturated: {
+    1: "#757a53",
+    2: "#696a58",
+    3: "#654e32",
+    4: "#6d431c",
+    5: "#64523c",
+    6: "#4d3522",
+    7: "#694f44",
+    8: "#456879",
+    9: "#766d5b",
+    10: "#775733",
+    11: "#763b1e",
+    12: "#494661",
+    13: "#74685f",
+    14: "#5d5b3c",
+    15: "#5b6578",
+    16: "#54443d",
+    17: "#6d3026",
+    18: "#6c4d31",
+    19: "#816843",
+    20: "#370d06",
+    21: "#867a51",
+    22: "#434d59",
+    23: "#8f8676",
+    24: "#65161b",
+    25: "#634e55",
+    26: "#77644e",
+    27: "#7e756a",
+    28: "#775f3e",
+    29: "#69563f",
+    30: "#85683a",
+    31: "#6e3730",
+    32: "#583326",
+    33: "#5c5c5f",
+    34: "#745f24",
+    35: "#6c3314",
+    36: "#5c725d",
+    37: "#8a6432",
+    38: "#856b4d",
+    39: "#7e6d49",
+    40: "#8a543d",
+    41: "#7d6c51",
+    42: "#3c3a29",
+    43: "#7e652f",
+    44: "#66819c",
+    45: "#2e4448",
+    46: "#705e44",
+    47: "#9b613f",
+    48: "#7e7f41",
+    49: "#3a3714",
+    50: "#586064",
+    51: "#72604c",
+    52: "#937e56",
+    53: "#682433",
+    54: "#494c51",
+    55: "#95822c",
+    56: "#7b726a",
+    57: "#5e4526",
+    58: "#643f22",
+    59: "#76723b",
+    60: "#1d762c",
+    61: "#724527",
+    62: "#692f1c",
+    63: "#486185",
+    64: "#66624b",
+    65: "#7b6a2f",
+    66: "#a57769",
+    67: "#3d291f",
+    68: "#72402a",
+    69: "#672f1e",
+    70: "#66707a",
+    71: "#6b6b66",
+    72: "#826125",
+    73: "#535237",
+    74: "#324028",
+    75: "#795929",
+    76: "#626748",
+    77: "#717477",
+    78: "#625767",
+    79: "#765b4b",
+    80: "#bc7c15",
+    81: "#602d11",
+    82: "#7a705f",
+    83: "#604d4b",
+    84: "#624938",
+    85: "#886e4a",
+    86: "#83197d",
+    87: "#7792b7",
+    88: "#7c793d",
+    89: "#7a6d52",
+    90: "#4e4f4b",
+    91: "#7f433d",
+  },
+  kmeans: {
+    1: "#737365",
+    2: "#232224",
+    3: "#080706",
+    4: "#322621",
+    5: "#2b2a1f",
+    6: "#554536",
+    7: "#2c221f",
+    8: "#708e9b",
+    9: "#7e796f",
+    10: "#403526",
+    11: "#4d3327",
+    12: "#82858b",
+    13: "#111112",
+    14: "#39362b",
+    15: "#828795",
+    16: "#b9ac9b",
+    17: "#2d1a1a",
+    18: "#c4bbb9",
+    19: "#1b1817",
+    20: "#1c0c04",
+    21: "#322f27",
+    22: "#272d32",
+    23: "#cbc9c4",
+    24: "#827167",
+    25: "#261c1e",
+    26: "#c5c1b2",
+    27: "#c7c7c2",
+    28: "#4e4233",
+    29: "#4a3f34",
+    30: "#3b3735",
+    31: "#1c1210",
+    32: "#1a1418",
+    33: "#585754",
+    34: "#7f6e3e",
+    35: "#54331e",
+    36: "#96836a",
+    37: "#90704a",
+    38: "#8f9db0",
+    39: "#838177",
+    40: "#181215",
+    41: "#887c68",
+    42: "#17160f",
+    43: "#4c474d",
+    44: "#7992a7",
+    45: "#43595b",
+    46: "#1b1713",
+    47: "#a28b71",
+    48: "#b9b057",
+    49: "#313119",
+    50: "#d1cfc1",
+    51: "#968974",
+    52: "#403c39",
+    53: "#221516",
+    54: "#252b2f",
+    55: "#988a44",
+    56: "#84807d",
+    57: "#544027",
+    58: "#7b6c5d",
+    59: "#9c8f71",
+    60: "#010101",
+    61: "#7e766e",
+    62: "#a58462",
+    63: "#818ca1",
+    64: "#908f85",
+    65: "#918254",
+    66: "#807982",
+    67: "#d0ccc0",
+    68: "#9f8168",
+    69: "#b68666",
+    70: "#858f98",
+    71: "#b9c6d4",
+    72: "#463928",
+    73: "#21221d",
+    74: "#191d15",
+    75: "#c7beb1",
+    76: "#4e523f",
+    77: "#cec6bb",
+    78: "#847775",
+    79: "#c4bfad",
+    80: "#a98044",
+    81: "#492410",
+    82: "#8c8b84",
+    83: "#514249",
+    84: "#c4c1b7",
+    85: "#1b1714",
+    86: "#090507",
+    87: "#90b6e1",
+    88: "#333225",
+    89: "#cac2ad",
+    90: "#5b6167",
+    91: "#5f3f3a",
+  },
+  accent: {
+    1: "#939486",
+    2: "#cdc1a2",
+    3: "#755b3c",
+    4: "#a58055",
+    5: "#7a6c5c",
+    6: "#a48e73",
+    7: "#cac5b7",
+    8: "#91b3c8",
+    9: "#756e62",
+    10: "#ad8e76",
+    11: "#ba7a3a",
+    12: "#605e6b",
+    13: "#d8d1c2",
+    14: "#5e5a45",
+    15: "#e1cfb8",
+    16: "#a49684",
+    17: "#9a5b4c",
+    18: "#513922",
+    19: "#d7af84",
+    20: "#8a423a",
+    21: "#a9a17a",
+    22: "#aacdec",
+    23: "#878073",
+    24: "#621a1e",
+    25: "#e5b7c6",
+    26: "#928577",
+    27: "#857e73",
+    28: "#a79a82",
+    29: "#b4a48e",
+    30: "#9c8b5f",
+    31: "#ac7378",
+    32: "#9e907b",
+    33: "#1e1e28",
+    34: "#a38d5a",
+    35: "#a1603f",
+    36: "#ab8767",
+    37: "#c2a37a",
+    38: "#dbc095",
+    39: "#6f5622",
+    40: "#b58564",
+    41: "#81745e",
+    42: "#b1b48e",
+    43: "#b0ac5a",
+    44: "#7694b1",
+    45: "#bd964e",
+    46: "#867761",
+    47: "#9e6f51",
+    48: "#c4b958",
+    49: "#4f4a30",
+    50: "#d3d1c2",
+    51: "#998c76",
+    52: "#9c8f71",
+    53: "#a55ba5",
+    54: "#c4b9a4",
+    55: "#9a8834",
+    56: "#ddd6cb",
+    57: "#a08662",
+    58: "#51331d",
+    59: "#aa9a82",
+    60: "#579a61",
+    61: "#48210e",
+    62: "#581b0c",
+    63: "#62789c",
+    64: "#c3d8df",
+    65: "#a89f6d",
+    66: "#e2ad86",
+    67: "#a19178",
+    68: "#84644a",
+    69: "#bb8969",
+    70: "#9ea9b3",
+    71: "#c4d1dd",
+    72: "#ae8f5b",
+    73: "#b2a894",
+    74: "#a0afa8",
+    75: "#84673b",
+    76: "#898a76",
+    77: "#376c9d",
+    78: "#9d8881",
+    79: "#563b30",
+    80: "#ebb329",
+    81: "#784b2c",
+    82: "#3b342a",
+    83: "#615157",
+    84: "#7f6f63",
+    85: "#b69c72",
+    86: "#9b2190",
+    87: "#87acd9",
+    88: "#b5cdea",
+    89: "#9a8e7b",
+    90: "#b88c60",
+    91: "#805c54",
+  },
+  brightness: {
+    1: "#8e8f85",
+    2: "#8b8674",
+    3: "#5e4b34",
+    4: "#8d7b69",
+    5: "#80756a",
+    6: "#75634f",
+    7: "#9c958b",
+    8: "#92b1bf",
+    9: "#9f9fa1",
+    10: "#9f8772",
+    11: "#9d7c58",
+    12: "#95979c",
+    13: "#b1aa9f",
+    14: "#9a978d",
+    15: "#a9a4a2",
+    16: "#9d9386",
+    17: "#907861",
+    18: "#b6aba5",
+    19: "#ae8e6a",
+    20: "#3c1f14",
+    21: "#918d74",
+    22: "#7b8e9f",
+    23: "#b1aea7",
+    24: "#938279",
+    25: "#ae8b98",
+    26: "#a19a8d",
+    27: "#b5b4ad",
+    28: "#897e6d",
+    29: "#a69989",
+    30: "#7e7764",
+    31: "#6b4847",
+    32: "#64564b",
+    33: "#868781",
+    34: "#917f58",
+    35: "#af9887",
+    36: "#a7a08b",
+    37: "#b39e82",
+    38: "#9e9e9b",
+    39: "#959184",
+    40: "#ac8c73",
+    41: "#b1a998",
+    42: "#5d604b",
+    43: "#968e6b",
+    44: "#899ba4",
+    45: "#767255",
+    46: "#847967",
+    47: "#ad9378",
+    48: "#acac6d",
+    49: "#989585",
+    50: "#b0b1a8",
+    51: "#80735f",
+    52: "#928c7d",
+    53: "#724757",
+    54: "#7a7974",
+    55: "#9e986e",
+    56: "#b2aca4",
+    57: "#9c876a",
+    58: "#877667",
+    59: "#a29d88",
+    60: "#3f6b43",
+    61: "#a19482",
+    62: "#b19d88",
+    63: "#7e8593",
+    64: "#9ca39d",
+    65: "#a69d7e",
+    66: "#a38e87",
+    67: "#b6aea1",
+    68: "#ac9683",
+    69: "#b1917c",
+    70: "#99a3ab",
+    71: "#adb8c2",
+    72: "#9d8a6a",
+    73: "#5f5c4e",
+    74: "#5e675e",
+    75: "#ac9c86",
+    76: "#898a79",
+    77: "#a8a39a",
+    78: "#999698",
+    79: "#afa897",
+    80: "#ccb37d",
+    81: "#a98263",
+    82: "#a3a299",
+    83: "#625658",
+    84: "#b0aa9f",
+    85: "#a3967c",
+    86: "#a28889",
+    87: "#86a8d1",
+    88: "#818671",
+    89: "#a29a87",
+    90: "#8f8275",
+    91: "#b2a6a2",
+  },
+  hue: {
+    1: "#5f574e",
+    2: "#a79c80",
+    3: "#5f4a2f",
+    4: "#63412a",
+    5: "#907c6c",
+    6: "#61523d",
+    7: "#989384",
+    8: "#9fc0d6",
+    9: "#817565",
+    10: "#90725f",
+    11: "#8e6632",
+    12: "#50476b",
+    13: "#17161b",
+    14: "#877b69",
+    15: "#7a8193",
+    16: "#a79781",
+    17: "#68302a",
+    18: "#866f4e",
+    19: "#937753",
+    20: "#221308",
+    21: "#b5a26a",
+    22: "#556679",
+    23: "#a19585",
+    24: "#661a1e",
+    25: "#927380",
+    26: "#6a5b4e",
+    27: "#7b7669",
+    28: "#766247",
+    29: "#897b65",
+    30: "#886a3f",
+    31: "#4d2a26",
+    32: "#1c1a27",
+    33: "#aaa38a",
+    34: "#81584a",
+    35: "#6e5333",
+    36: "#956d4d",
+    37: "#957d58",
+    38: "#8ea0b8",
+    39: "#8b7e61",
+    40: "#c1aa8d",
+    41: "#9b896e",
+    42: "#2b2718",
+    43: "#3c4965",
+    44: "#819eb6",
+    45: "#20344d",
+    46: "#6d5f49",
+    47: "#ac977b",
+    48: "#c3b756",
+    49: "#35381c",
+    50: "#d3ceb8",
+    51: "#796c59",
+    52: "#665e53",
+    53: "#5f381a",
+    54: "#3f5462",
+    55: "#968642",
+    56: "#e0d0b8",
+    57: "#836c4c",
+    58: "#887c6d",
+    59: "#847e4a",
+    60: "#352d23",
+    61: "#bd9f72",
+    62: "#aa8c65",
+    63: "#5b6f90",
+    64: "#847968",
+    65: "#98a149",
+    66: "#ce8b74",
+    67: "#7e694f",
+    68: "#825f47",
+    69: "#a56a55",
+    70: "#8994a1",
+    71: "#b1c0d1",
+    72: "#786141",
+    73: "#55453b",
+    74: "#2b3119",
+    75: "#947b57",
+    76: "#757760",
+    77: "#a29789",
+    78: "#7d6a5b",
+    79: "#beb8a4",
+    80: "#c3995d",
+    81: "#8f5e3c",
+    82: "#816f55",
+    83: "#473a44",
+    84: "#908067",
+    85: "#574c3d",
+    86: "#695c4a",
+    87: "#88acd9",
+    88: "#656738",
+    89: "#65564a",
+    90: "#9f7e52",
+    91: "#7e4843",
+  },
+  center: {
+    1: "#6c695e",
+    2: "#5a5a52",
+    3: "#2e281f",
+    4: "#806954",
+    5: "#5f574a",
+    6: "#4e3f2f",
+    7: "#6b6057",
+    8: "#87a4b0",
+    9: "#888783",
+    10: "#807062",
+    11: "#957050",
+    12: "#7f8084",
+    13: "#868177",
+    14: "#7a7363",
+    15: "#aba3a0",
+    16: "#7d7269",
+    17: "#845b4c",
+    18: "#948779",
+    19: "#534536",
+    20: "#301209",
+    21: "#8a8667",
+    22: "#4c565f",
+    23: "#797976",
+    24: "#8f7872",
+    25: "#8b6d73",
+    26: "#8a7f73",
+    27: "#9f9c96",
+    28: "#81745e",
+    29: "#807264",
+    30: "#776f5c",
+    31: "#392425",
+    32: "#4d4138",
+    33: "#787a78",
+    34: "#746c3f",
+    35: "#a37e6c",
+    36: "#717e70",
+    37: "#947c5b",
+    38: "#9f9587",
+    39: "#958e7d",
+    40: "#785e4d",
+    41: "#958d7b",
+    42: "#36372a",
+    43: "#989564",
+    44: "#748894",
+    45: "#67674a",
+    46: "#6b5f4e",
+    47: "#af8e71",
+    48: "#93925b",
+    49: "#5f5b47",
+    50: "#848886",
+    51: "#827561",
+    52: "#69655e",
+    53: "#642758",
+    54: "#5f6160",
+    55: "#9a9263",
+    56: "#938f89",
+    57: "#7b6a53",
+    58: "#725944",
+    59: "#898471",
+    60: "#090907",
+    61: "#9f9484",
+    62: "#8d6552",
+    63: "#7a7c82",
+    64: "#8c9794",
+    65: "#948662",
+    66: "#a0837a",
+    67: "#948776",
+    68: "#8d7060",
+    69: "#906248",
+    70: "#86929a",
+    71: "#919aa1",
+    72: "#977f53",
+    73: "#575745",
+    74: "#47544c",
+    75: "#93836e",
+    76: "#7d8069",
+    77: "#999895",
+    78: "#686266",
+    79: "#a29787",
+    80: "#a78e65",
+    81: "#a18368",
+    82: "#a4a093",
+    83: "#635456",
+    84: "#afaaa5",
+    85: "#918266",
+    86: "#674953",
+    87: "#85a7d1",
+    88: "#75745a",
+    89: "#92887b",
+    90: "#876c54",
+    91: "#7d726f",
+  },
+  temperature: {
+    1: "#8f6e61",
+    2: "#8f6e61",
+    3: "#926e5f",
+    4: "#946f5d",
+    5: "#916e5f",
+    6: "#956f5d",
+    7: "#906e60",
+    8: "#7e656e",
+    9: "#8c6e63",
+    10: "#976f5b",
+    11: "#9f7055",
+    12: "#896c65",
+    13: "#8e6e62",
+    14: "#906e60",
+    15: "#8c6e63",
+    16: "#926e5f",
+    17: "#986f5a",
+    18: "#926e5f",
+    19: "#976f5b",
+    20: "#956f5c",
+    21: "#926e5e",
+    22: "#846969",
+    23: "#8f6e61",
+    24: "#966f5c",
+    25: "#906e60",
+    26: "#916e5f",
+    27: "#8e6e62",
+    28: "#946f5d",
+    29: "#946f5d",
+    30: "#926e5f",
+    31: "#936e5e",
+    32: "#906e60",
+    33: "#8c6e63",
+    34: "#9c7057",
+    35: "#9a6f58",
+    36: "#926e5f",
+    37: "#9a6f59",
+    38: "#8c6e63",
+    39: "#916e5f",
+    40: "#966f5b",
+    41: "#926e5e",
+    42: "#8f6e61",
+    43: "#956f5d",
+    44: "#846969",
+    45: "#8d6e62",
+    46: "#926e5f",
+    47: "#9c7057",
+    48: "#9a6f58",
+    49: "#926e5e",
+    50: "#8d6e63",
+    51: "#966f5c",
+    52: "#916e60",
+    53: "#936e5e",
+    54: "#8b6d64",
+    55: "#9b6f58",
+    56: "#8f6e61",
+    57: "#9b6f58",
+    58: "#966f5b",
+    59: "#946f5d",
+    60: "#8c6e63",
+    61: "#956f5d",
+    62: "#9b6f58",
+    63: "#846969",
+    64: "#8d6e63",
+    65: "#976f5b",
+    66: "#916e5f",
+    67: "#926e5e",
+    68: "#996f59",
+    69: "#9b6f58",
+    70: "#866a67",
+    71: "#876a67",
+    72: "#9a6f59",
+    73: "#8f6e61",
+    74: "#8c6e63",
+    75: "#986f5a",
+    76: "#906e60",
+    77: "#8f6e61",
+    78: "#8c6e63",
+    79: "#946f5d",
+    80: "#9f7055",
+    81: "#a07054",
+    82: "#8e6e61",
+    83: "#8e6e62",
+    84: "#916e5f",
+    85: "#926e5e",
+    86: "#906e60",
+    87: "#766073",
+    88: "#916e5f",
+    89: "#936e5e",
+    90: "#916e60",
+    91: "#926e5e",
+  },
+  tumblr: {
+    1: "#2a231c",
+    2: "#020203",
+    3: "#030201",
+    4: "#050302",
+    5: "#060604",
+    6: "#030201",
+    7: "#110e0b",
+    8: "#486d84",
+    9: "#2f261c",
+    10: "#4d2718",
+    11: "#0f0400",
+    12: "#0c0906",
+    13: "#020203",
+    14: "#030202",
+    15: "#838288",
+    16: "#1a0e08",
+    17: "#0e0705",
+    18: "#8c766d",
+    19: "#020202",
+    20: "#040201",
+    21: "#090a07",
+    22: "#030407",
+    23: "#1a170f",
+    24: "#1f0203",
+    25: "#0e090d",
+    26: "#13100d",
+    27: "#a3a7a4",
+    28: "#261b14",
+    29: "#0a0604",
+    30: "#333",
+    31: "#010000",
+    32: "#080704",
+    33: "#171614",
+    34: "#070404",
+    35: "#211006",
+    36: "#1d1a18",
+    37: "#352e2f",
+    38: "#51678a",
+    39: "#413219",
+    40: "#010102",
+    41: "#52442b",
+    42: "#010100",
+    43: "#0b1125",
+    44: "#2f496e",
+    45: "#030c1c",
+    46: "#070c06",
+    47: "#695035",
+    48: "#010101",
+    49: "#030302",
+    50: "#010203",
+    51: "#30291d",
+    52: "#020202",
+    53: "#040102",
+    54: "#060606",
+    55: "#584608",
+    56: "#313032",
+    57: "#010102",
+    58: "#362b1f",
+    59: "#040404",
+    60: "#000000",
+    61: "#24272d",
+    62: "#47221d",
+    63: "#2e405e",
+    64: "#1a1f0d",
+    65: "#100704",
+    66: "#30303d",
+    67: "#0e0702",
+    68: "#040101",
+    69: "#050201",
+    70: "#0e1411",
+    71: "#696f6d",
+    72: "#0f0a06",
+    73: "#030402",
+    74: "#000000",
+    75: "#090505",
+    76: "#1d1f16",
+    77: "#0e0c0a",
+    78: "#0f0c09",
+    79: "#9c9377",
+    80: "#010101",
+    81: "#110401",
+    82: "#585b57",
+    83: "#080708",
+    84: "#888779",
+    85: "#020101",
+    86: "#000000",
+    87: "#3f6db8",
+    88: "#0b0603",
+    89: "#050302",
+    90: "#0e0603",
+    91: "#411613",
+  },
+};
+let currentColorMode = "saturated";
+
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function dayToDate(d) {
+  const dt = new Date(DAY_ONE);
+  dt.setDate(dt.getDate() + (d - 1));
+  return dt;
+}
+function fmtDate(d) {
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+}
+function wordCount(s) { return s.split(/\s+/).length; }
+
+const maxWC = Math.max(...Object.values(P).map(p => wordCount(p.t)));
+
+// ── Image cache (lazy on hover + neighbor preload) ──
+const imgCache = {};
+function loadImg(day) {
+  if (imgCache[day]) return imgCache[day];
+  const p = P[day];
+  if (!p) return null;
+  imgCache[day] = new Promise(res => {
+    const im = new Image();
+    im.onload = () => res(im.src);
+    im.onerror = () => res(null);
+    im.src = p.img;
+  });
+  return imgCache[day];
+}
+function preloadNear(day) {
+  for (let d = day - 2; d <= day + 2; d++) {
+    if (P[d] && !imgCache[d]) loadImg(d);
+  }
+}
+
+// ═══════════════════════════════════════════
+// BUILD MONTH HEADERS
+// ═══════════════════════════════════════════
+const monthsEl = document.getElementById('months');
+const mSpans = [];
+let lm = -1;
+for (let i = 1; i <= TOTAL; i++) {
+  const m = dayToDate(i).getMonth();
+  if (m !== lm) {
+    mSpans.push({ label: dayToDate(i).toLocaleDateString('en-IN', { month:'long' }), n: 1 });
+    lm = m;
+  } else mSpans[mSpans.length-1].n++;
+}
+mSpans.forEach(ms => {
+  const el = document.createElement('div');
+  el.className = 'month-label';
+  el.style.flex = ms.n;
+  el.textContent = ms.label;
+  monthsEl.appendChild(el);
+});
+
+// ═══════════════════════════════════════════
+// BUILD STRIPS
+// ═══════════════════════════════════════════
+const stripsEl = document.getElementById('strips');
+let pm = -1;
+
+for (let i = 1; i <= TOTAL; i++) {
+  const dt = dayToDate(i);
+  const m = dt.getMonth();
+  const isMS = m !== pm && i > 1;
+  pm = m;
+
+  const post = P[i];
+  const s = document.createElement('div');
+  s.className = 'strip' + (post ? ' has-data' : '') + (isMS ? ' month-start' : '');
+  s.dataset.day = i;
+
+  // Color strip from image dominant color
+  if (post && COLOR_MODES[currentColorMode][i]) {
+    s.style.background = COLOR_MODES[currentColorMode][i];
+  }
+
+  // Bar
+  if (post) {
+    const wc = wordCount(post.t);
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = (wc * 5) + 'px';
+    // Lighter tint of the strip's dominant color
+    // bar color set dynamically via recolor()
+    s.appendChild(bar);
+  }
+
+  stripsEl.appendChild(s);
+}
+
+// ═══════════════════════════════════════════
+// BUILD RULER
+// ═══════════════════════════════════════════
+const rulerEl = document.getElementById('ruler');
+for (let i = 1; i <= TOTAL; i++) {
+  const post = P[i];
+  const mark = document.createElement('div');
+  mark.className = 'ruler-mark';
+
+  const tk = document.createElement('div');
+  tk.className = 'tick';
+  tk.style.height = post ? '6px' : (i % 5 === 0 ? '4px' : '2px');
+  tk.style.background = '#D8D2C8';
+  mark.appendChild(tk);
+
+  const show = i === 1 || i === TOTAL || i % 10 === 0;
+  const dn = document.createElement('div');
+  dn.className = 'day-num';
+  dn.textContent = show ? i : '';
+  mark.appendChild(dn);
+
+  rulerEl.appendChild(mark);
+}
+
+// ═══════════════════════════════════════════
+// HOVER CARD
+// ═══════════════════════════════════════════
+const card = document.getElementById('hoverCard');
+const inner = document.getElementById('cardInner');
+let curDay = null;
+
+function showCard(day, x, y) {
+  const post = P[day];
+  const dt = dayToDate(day);
+
+  if (post) {
+    inner.innerHTML =
+      '<div class="card-img-wrap" style="background:' + post.c + '">' +
+        '<div class="card-img-placeholder"><span>·</span></div>' +
+        '<img class="card-img" id="cImg" alt="" />' +
+      '</div>' +
+      '<div class="card-meta">' +
+        '<div class="card-meta-row">' +
+          '<span class="card-day">Day ' + day + '</span>' +
+          '<span class="card-date">' + fmtDate(dt) + '</span>' +
+        '</div>' +
+        '<div class="card-text">' + post.t + '</div>' +
+      '</div>';
+
+    const imgEl = document.getElementById('cImg');
+    const cached = loadImg(day);
+    if (cached) {
+      cached.then(src => {
+        if (src && curDay === day) {
+          imgEl.src = src;
+          imgEl.classList.add('loaded');
+        }
+      });
+    }
+    preloadNear(day);
+  } else {
+    inner.innerHTML =
+      '<div class="card-empty">' +
+        '<div class="card-day">Day ' + day + '</div>' +
+        '<span class="card-date">' + fmtDate(dt) + '</span>' +
+        '<div class="card-empty-msg">Awaiting data</div>' +
+      '</div>';
+  }
+
+  posCard(x, y);
+  card.classList.add('visible');
+}
+
+function posCard(x, y) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const cw = 310;
+  const left = x > vw * 0.6 ? x - cw - 14 : x + 14;
+  const top = Math.max(6, Math.min(y - 120, vh - 340));
+  card.style.left = left + 'px';
+  card.style.top = top + 'px';
+}
+
+function hideCard() {
+  curDay = null;
+  card.classList.remove('visible');
+}
+
+// Single event delegation
+stripsEl.addEventListener('mousemove', e => {
+  const s = e.target.closest('.strip');
+  if (!s) { hideCard(); return; }
+  const day = +s.dataset.day;
+  if (day !== curDay) {
+    curDay = day;
+    showCard(day, e.clientX, e.clientY);
+  } else {
+    posCard(e.clientX, e.clientY);
+  }
+});
+stripsEl.addEventListener('mouseleave', hideCard);
+
+// ═══════════════════════════════════════════
+// RECOLOR STRIPS
+// ═══════════════════════════════════════════
+function recolor(mode) {
+  currentColorMode = mode;
+  const colors = COLOR_MODES[mode];
+  const strips = stripsEl.querySelectorAll('.strip.has-data');
+  strips.forEach(s => {
+    const day = +s.dataset.day;
+    const col = colors[day];
+    if (col) {
+      s.style.background = col;
+      // Update bar to lighter tint
+      const bar = s.querySelector('.bar');
+      if (bar) {
+        const r = parseInt(col.slice(1,3),16), g = parseInt(col.slice(3,5),16), b = parseInt(col.slice(5,7),16);
+        bar.style.background = `rgb(${Math.min(255,r+60)},${Math.min(255,g+60)},${Math.min(255,b+60)})`;
+      }
+    }
+  });
+}
+
+// Set initial bar colors
+recolor('saturated');
+
+// ═══════════════════════════════════════════
+// COLOR MODE TOGGLES
+// ═══════════════════════════════════════════
+document.getElementById('colorToggles').addEventListener('click', e => {
+  const btn = e.target.closest('[data-mode]');
+  if (!btn) return;
+  document.querySelectorAll('#colorToggles .toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recolor(btn.dataset.mode);
+});
+
+// ═══════════════════════════════════════════
+// TOGGLE WORD COUNT BARS
+// ═══════════════════════════════════════════
+const toggleBtn = document.getElementById('toggleBars');
+toggleBtn.addEventListener('click', () => {
+  stripsEl.classList.toggle('bars-hidden');
+  toggleBtn.classList.toggle('active');
+});
+
+// ═══════════════════════════════════════════
+// TOGGLE BAR WIDTH
+// ═══════════════════════════════════════════
+const toggleWidth = document.getElementById('toggleWidth');
+toggleWidth.addEventListener('click', () => {
+  stripsEl.classList.toggle('bars-wide');
+  toggleWidth.classList.toggle('active');
+});
+
+// ═══════════════════════════════════════════
+// TOGGLE BAR SCALE (1× / 10×)
+// ═══════════════════════════════════════════
+let barScale = 1;
+const toggleScale = document.getElementById('toggleScale');
+toggleScale.addEventListener('click', () => {
+  barScale = barScale === 1 ? 5 : 1;
+  toggleScale.classList.toggle('active');
+  toggleScale.textContent = barScale === 5 ? '1×' : '5×';
+  stripsEl.querySelectorAll('.strip.has-data').forEach(s => {
+    const bar = s.querySelector('.bar');
+    if (bar) {
+      const day = +s.dataset.day;
+      const wc = wordCount(P[day].t);
+      bar.style.height = (wc * barScale) + 'px';
+    }
+  });
+});
+</script>
+
+</body>
+</html>
