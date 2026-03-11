@@ -1467,33 +1467,6 @@ toggleBtn.addEventListener('click', () => {
   toggleBtn.classList.toggle('active');
 });
 
-// ═══════════════════════════════════════════
-// TOGGLE BAR WIDTH
-// ═══════════════════════════════════════════
-const toggleWidth = document.getElementById('toggleWidth');
-toggleWidth.addEventListener('click', () => {
-  stripsEl.classList.toggle('bars-wide');
-  toggleWidth.classList.toggle('active');
-});
-
-// ═══════════════════════════════════════════
-// TOGGLE BAR SCALE (1× / 10×)
-// ═══════════════════════════════════════════
-let barScale = 1;
-const toggleScale = document.getElementById('toggleScale');
-toggleScale.addEventListener('click', () => {
-  barScale = barScale === 1 ? 5 : 1;
-  toggleScale.classList.toggle('active');
-  toggleScale.textContent = barScale === 5 ? '1×' : '5×';
-  stripsEl.querySelectorAll('.strip.has-data').forEach(s => {
-    const bar = s.querySelector('.bar');
-    if (bar) {
-      const day = +s.dataset.day;
-      const wc = wordCount(P[day].t);
-      bar.style.height = (wc * barScale) + 'px';
-    }
-  });
-});
 </script>
 
 </body>
